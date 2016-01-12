@@ -5,16 +5,18 @@
 #include <cmath>
 #include <iostream>
 
+
+typedef float Dfloat;
 using namespace std;
 
-const long double PI = 3.1415926;
+const Dfloat PI = 3.1415926;
 
 struct Pos{
-	double x;
-	double y;
-	double z;
+	Dfloat x;
+	Dfloat y;
+	Dfloat z;
 	Pos():x(0.0),y(0.0),z(0.0){}
-	Pos(double X,double Y,double Z):x(X),y(Y),z(Z){}
+	Pos(Dfloat X,Dfloat Y,Dfloat Z):x(X),y(Y),z(Z){}
 	static Pos pos_sub(Pos p1,Pos p2)
 	{
 		return Pos(p1.x-p2.x,p1.y-p2.y,p1.z-p2.z);
@@ -23,11 +25,11 @@ struct Pos{
 	{
 		return Pos(p1.x+p2.x,p1.y+p2.y,p1.z+p2.z);
 	}
-	static double pos_norm(Pos p)
+	static Dfloat pos_norm(Pos p)
 	{
 		return sqrt(p.x*p.x+p.y*p.y+p.z*p.z);
 	}
-	static double pos_norm_2(Pos p)
+	static Dfloat pos_norm_2(Pos p)
 	{
 		return p.x*p.x+p.y*p.y+p.z*p.z;
 	}
@@ -35,11 +37,11 @@ struct Pos{
 	{
 		return Pos(p1.y*p2.z-p1.z*p2.y,p1.z*p2.x-p1.x*p2.z,p1.x*p2.y-p1.y*p2.x);
 	}
-	static double pos_dot(Pos p1,Pos p2)
+	static Dfloat pos_dot(Pos p1,Pos p2)
 	{
 		return p1.x*p2.x + p1.y*p2.y + p1.z*p2.z;
 	}
-	static Pos pos_mul(double k,Pos p)
+	static Pos pos_mul(Dfloat k,Pos p)
 	{
 		return Pos(k*p.x,k*p.y,k*p.z);
 	}
@@ -52,34 +54,37 @@ struct Pos{
 };
 
 struct Delta{
-	double R;
-	double r;
-	double alpha[3];
-	double l1;
-	double l2;
+	Dfloat R;
+	Dfloat r;
+	Dfloat alpha[3];
+	Dfloat l1;
+	Dfloat l2;
 	//use befor kin
-	double kin_theta[3];
+	Dfloat kin_theta[3];
 	Pos kin_pos;
 	//use befor in_kin function
-	double in_theta[3];
-	Delta(double R_,double r_,double l1_,double l2_):R(R_),r(r_),l1(l1_),l2(l2_),kin_pos(Pos(0,0,0)){
+	Dfloat in_theta[3];
+	//E and P for draw l2
+	Pos E[3];
+	Pos P[3];
+	Delta(Dfloat R_,Dfloat r_,Dfloat l1_,Dfloat l2_):R(R_),r(r_),l1(l1_),l2(l2_),kin_pos(Pos(0,0,0)){
 		for(int i = 0;i<3;i++)
 		{
 			alpha[i] = (4*(i+1)-3)*PI/6.0;
 		}
 	}
-	void set_kin_theta(double theta1,double theta2,double theta3){
+	void set_kin_theta(Dfloat theta1,Dfloat theta2,Dfloat theta3){
 		kin_theta[0] = theta1;
 		kin_theta[1] = theta2;
 		kin_theta[2] = theta3;
 	}
-	void f_kuv(Pos pos,double kuv[3][3]){
+	void f_kuv(Pos pos,Dfloat kuv[3][3]){
 		kuv[0][0] = l2*l2-l1*l1-pos.x*pos.x-pos.y*pos.y-pos.z*pos.z-(R-r)*(R-r)\
 				+(R-r)*(1.732*pos.x+pos.y)+2*pos.z*l1;
 
-		// double a = 2*pos.z*l1;
+		// Dfloat a = 2*pos.z*l1;
 		// // a = a/100.0;
-		// double b = l2*l2-l1*l1-pos.x*pos.x-pos.y*pos.y-pos.z*pos.z-(R-r)*(R-r)+(R-r)*(1.732*pos.x+pos.y);
+		// Dfloat b = l2*l2-l1*l1-pos.x*pos.x-pos.y*pos.y-pos.z*pos.z-(R-r)*(R-r)+(R-r)*(1.732*pos.x+pos.y);
 		// // b = b/100.0;
 		// cout<<"6666666666666666666666666: "<<2*pos.z*l1<<endl;
 		// cout<<"6666666666666666666666666: "<<(R-r)*(1.732*pos.x+pos.y)<<endl;
@@ -96,14 +101,14 @@ struct Delta{
 		kuv[0][2] = kuv[0][0] - 4*pos.z*l1;
 		// return kuv1;
 	// }
-	// void f_kuv2(Pos pos,double kuv[]){
+	// void f_kuv2(Pos pos,Dfloat kuv[]){
 		kuv[1][0] = l2*l2-l1*l1-pos.x*pos.x-pos.y*pos.y-pos.z*pos.z-(R-r)*(R-r)\
 				+(R-r)*(pos.y-1.732*pos.x)+2*pos.z*l1;
 		kuv[1][1] = -2*(2*(R-r)+1.732*pos.x-pos.y)*l1;
 		kuv[1][2] = kuv[1][0] - 4*pos.z*l1;
 		// return kuv1;
 	// }
-	// void f_kuv3(Pos pos,double kuv[]){
+	// void f_kuv3(Pos pos,Dfloat kuv[]){
 		kuv[2][0] = l2*l2-l1*l1-pos.x*pos.x-pos.z*pos.z-(R-r+pos.y)*(R-r+pos.y)\
 				+2*pos.z*l1;
 		kuv[2][1] = -4*l1*(R-r+pos.y);
@@ -112,13 +117,13 @@ struct Delta{
 	}
 
 	Pos inKin(Pos pos){
-		double kuvs[3][3]={0.0};
+		Dfloat kuvs[3][3]={0.0};
 		f_kuv(pos,kuvs);
 		
 		cout<<"--------------kuv1--- "<<kuvs[0][0]<<" *** "<<kuvs[0][1]<<" *** "<<kuvs[0][2]<<endl;
 		cout<<"--------------kuv2--- "<<kuvs[1][0]<<" *** "<<kuvs[1][1]<<" *** "<<kuvs[1][2]<<endl;
 		cout<<"--------------kuv3--- "<<kuvs[2][0]<<" *** "<<kuvs[2][1]<<" *** "<<kuvs[2][2]<<endl;
-		double t;
+		Dfloat t;
 		for(int i = 0;i<3;i++)
 		{
 			if(fabs(kuvs[i][0])<0.001)
@@ -175,25 +180,25 @@ struct Delta{
 		Pos::pos_print(E_2E_3);
 
 
-		double a = Pos::pos_norm(E_1E_2);
-		double b = Pos::pos_norm(E_3E_1);
-		double c = Pos::pos_norm(E_2E_3);
+		Dfloat a = Pos::pos_norm(E_1E_2);
+		Dfloat b = Pos::pos_norm(E_3E_1);
+		Dfloat c = Pos::pos_norm(E_2E_3);
 
 		//Debug
 		cout<<"---length of e1e2e3---"<<endl;
 		cout<<a<<"  "<<b<<"  "<<c<<endl;
 
-		double E2F_NORM = (a*b*c)/( sqrt( (a+b+c)*(a+b-c)*(a+c-b)*(c+b-a) ) );
+		Dfloat E2F_NORM = (a*b*c)/( sqrt( (a+b+c)*(a+b-c)*(a+c-b)*(c+b-a) ) );
 
 		
-		double EF_NORM = sqrt(E2F_NORM*E2F_NORM-a*a*0.25);
+		Dfloat EF_NORM = sqrt(E2F_NORM*E2F_NORM-a*a*0.25);
 
 		cout<<"e2f_norm : "<<E2F_NORM<<endl;
 		cout<<"ef_norm : "<<EF_NORM<<endl;
 
 
-		double cos_1 = Pos::pos_dot(E_2E_3,E_1E_2)/(c*a);
-		double sin_1 = sqrt(1-cos_1*cos_1);
+		Dfloat cos_1 = Pos::pos_dot(E_2E_3,E_1E_2)/(c*a);
+		Dfloat sin_1 = sqrt(1-cos_1*cos_1);
 
 		Pos E_1E_2_cross_E_2E_3 = Pos::pos_mul(1.0/(a*c*sin_1), Pos::pos_cross(E_1E_2,E_2E_3) );
 
@@ -223,7 +228,7 @@ struct Delta{
 		cout<<Pos::pos_norm(Pos::pos_sub(OF,OE_[1]))<<endl;
 		cout<<Pos::pos_norm(Pos::pos_sub(OF,OE_[2]))<<endl;
 
-		double FO_NORM = sqrt( l2*l2 - E2F_NORM*E2F_NORM);
+		Dfloat FO_NORM = sqrt( l2*l2 - E2F_NORM*E2F_NORM);
 
 		//Debug
 		cout<<"fo_ norm is : "<<FO_NORM<<endl;
@@ -259,24 +264,19 @@ struct Delta{
 		
 	}
 
-
-	void len_l2(double *theta,Pos p,double *lenL2)
-	{
-		Pos E[3];
+	void calculate_l2_endpoint(Dfloat *theta,Pos p){
 		for(int i = 0;i < 3;i++){
 			E[i] = Pos((R+l1*sin(theta[i]))*cos(alpha[i]) , (R+l1*sin(theta[i]))*sin(alpha[i]) , -l1*cos(theta[i]));
 		}
-		// cout<<"-----------------------E0"<<endl;
-		// Pos::pos_print(E[0]);
-
-		Pos P[3];
 		for(int i = 0;i < 3;i++)
 		{
 			P[i] = Pos(r*cos(alpha[i])+p.x , r*sin(alpha[i])+p.y , p.z);
 		}
+	}
 
-		// cout<<"-----------------------P0"<<endl;
-		// Pos::pos_print(P[0]);
+	void len_l2(Dfloat *theta,Pos p,Dfloat *lenL2)
+	{
+		calculate_l2_endpoint(theta,p);
 
 		for(int i = 0;i < 3;i++)
 		{
@@ -284,7 +284,7 @@ struct Delta{
 		}
 	}
 
-	static void print_degree(double *d){
+	static void print_degree(Dfloat *d){
 		cout<<"Degree -----------------------"<<endl;
 		cout<<d[0]*180/PI<<" "<<d[1]*180/PI<<" "<<d[2]*180/PI<<endl;
 		cout<<"Degree -----------------------"<<endl;
