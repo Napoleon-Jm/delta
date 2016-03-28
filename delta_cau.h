@@ -116,7 +116,7 @@ struct Delta{
 		// return kuv;
 	}
 
-	Pos inKin(Pos pos){
+	void inKin(Pos pos){
 		Dfloat kuvs[3][3]={0.0};
 		f_kuv(pos,kuvs);
 		
@@ -140,7 +140,7 @@ struct Delta{
 
 	}
 
-	Pos kin(){
+	void kin(){
 		Pos v_OE[3];
 		Pos PO_[3];
 		Pos OE_[3];

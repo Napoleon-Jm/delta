@@ -120,7 +120,7 @@ void display(void)
 
   glLoadIdentity();  //加载单位矩阵
 
-  gluLookAt(0.0,3.5,6.0,  0.0,0.0,0.0,  0.0,1.0,0.0);
+  gluLookAt(0.0,3.5,6.0,  0.0,0.0,0.0,  0.0,1.0,0.0);//camera pos,look at pos,the top of the camera to pos
 
   glTranslatef(0.0,2.0,0.0);
   
