@@ -3,6 +3,20 @@
 
 using namespace std;
 
+//PLC write algorithm read.
+#define PLC_IS_WRITE 0;//0x00000
+#define PLC_WRITE_COUNT 2//0X00002
+#define ALG_IS_READ 14;//0x00014
+#define ALG_READ_COUNT 16;//0x00016
+#define ALG_READ_CONTENT 65536;//0x10000
+
+//PLC read algorithm write.
+#define PLC_IS_READ 262144;//0x40000
+#define PLC_READ_COUNT 262156//0X40012
+#define ALG_IS_WRITE 262158;//0X40014
+#define ALG_WRITE_COUNT 262160;//0x40016
+#define ALG_WRITE_CONTENT 327680;//0x50000
+
 //base address of share memory
 const int ADD_BASE = 0x10000010;
 
@@ -79,6 +93,4 @@ int main(){
 
 	
 	return 0;
-	}
-
 }
