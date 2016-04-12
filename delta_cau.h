@@ -120,9 +120,9 @@ struct Delta{
 		Dfloat kuvs[3][3]={0.0};
 		f_kuv(pos,kuvs);
 		
-		cout<<"--------------kuv1--- "<<kuvs[0][0]<<" *** "<<kuvs[0][1]<<" *** "<<kuvs[0][2]<<endl;
-		cout<<"--------------kuv2--- "<<kuvs[1][0]<<" *** "<<kuvs[1][1]<<" *** "<<kuvs[1][2]<<endl;
-		cout<<"--------------kuv3--- "<<kuvs[2][0]<<" *** "<<kuvs[2][1]<<" *** "<<kuvs[2][2]<<endl;
+		// cout<<"--------------kuv1--- "<<kuvs[0][0]<<" *** "<<kuvs[0][1]<<" *** "<<kuvs[0][2]<<endl;
+		// cout<<"--------------kuv2--- "<<kuvs[1][0]<<" *** "<<kuvs[1][1]<<" *** "<<kuvs[1][2]<<endl;
+		// cout<<"--------------kuv3--- "<<kuvs[2][0]<<" *** "<<kuvs[2][1]<<" *** "<<kuvs[2][2]<<endl;
 		Dfloat t;
 		for(int i = 0;i<3;i++)
 		{
@@ -152,32 +152,32 @@ struct Delta{
 
 		}
 
-		for(auto i:v_OE)
-		{
-			cout<<"&&&&&&&&&&&&&&&  OE  "<<endl;
-			Pos::pos_print(i);
-		}
+		// for(auto i:v_OE)
+		// {
+		// 	cout<<"&&&&&&&&&&&&&&&  OE  "<<endl;
+		// 	Pos::pos_print(i);
+		// }
 
 		//Debug
-		for(auto i:OE_)
-		{
-			cout<<"&&&&&&&&&&&&&&&  OE_ "<<endl;
-			Pos::pos_print(i);
-		}
+		// for(auto i:OE_)
+		// {
+		// 	cout<<"&&&&&&&&&&&&&&&  OE_ "<<endl;
+		// 	Pos::pos_print(i);
+		// }
 
 		Pos OE = Pos::pos_mul(0.5,Pos::pos_sum(OE_[0],OE_[1]));//----------------------------------OE
 		//Debug
-		cout<<"---OE---"<<endl;
-		Pos::pos_print(OE);
+		// cout<<"---OE---"<<endl;
+		// Pos::pos_print(OE);
 		Pos E_1E_2 = Pos::pos_sub(OE_[1],OE_[0]);
 		Pos E_3E_1 = Pos::pos_sub(OE_[0],OE_[2]);
 		Pos E_2E_3 = Pos::pos_sub(OE_[2],OE_[1]);
 
 		//Debug
-		cout<<"---e1e2e3---"<<endl;
-		Pos::pos_print(E_1E_2);
-		Pos::pos_print(E_3E_1);
-		Pos::pos_print(E_2E_3);
+		// cout<<"---e1e2e3---"<<endl;
+		// Pos::pos_print(E_1E_2);
+		// Pos::pos_print(E_3E_1);
+		// Pos::pos_print(E_2E_3);
 
 
 		Dfloat a = Pos::pos_norm(E_1E_2);
@@ -185,16 +185,16 @@ struct Delta{
 		Dfloat c = Pos::pos_norm(E_2E_3);
 
 		//Debug
-		cout<<"---length of e1e2e3---"<<endl;
-		cout<<a<<"  "<<b<<"  "<<c<<endl;
+		// cout<<"---length of e1e2e3---"<<endl;
+		// cout<<a<<"  "<<b<<"  "<<c<<endl;
 
 		Dfloat E2F_NORM = (a*b*c)/( sqrt( (a+b+c)*(a+b-c)*(a+c-b)*(c+b-a) ) );
 
 		
 		Dfloat EF_NORM = sqrt(E2F_NORM*E2F_NORM-a*a*0.25);
 
-		cout<<"e2f_norm : "<<E2F_NORM<<endl;
-		cout<<"ef_norm : "<<EF_NORM<<endl;
+		// cout<<"e2f_norm : "<<E2F_NORM<<endl;
+		// cout<<"ef_norm : "<<EF_NORM<<endl;
 
 
 		Dfloat cos_1 = Pos::pos_dot(E_2E_3,E_1E_2)/(c*a);
@@ -203,35 +203,35 @@ struct Delta{
 		Pos E_1E_2_cross_E_2E_3 = Pos::pos_mul(1.0/(a*c*sin_1), Pos::pos_cross(E_1E_2,E_2E_3) );
 
 
-		cout<<"e1e2  cross  e2e3 len : "<<Pos::pos_norm(E_1E_2_cross_E_2E_3)<<endl;// norm = 1
+		// cout<<"e1e2  cross  e2e3 len : "<<Pos::pos_norm(E_1E_2_cross_E_2E_3)<<endl;// norm = 1
 
-		cout<<"e1e2  cross  e2e3 len     ---      dot   e1e2 "<<Pos::pos_dot(E_1E_2_cross_E_2E_3,E_1E_2)<<endl;
+		// cout<<"e1e2  cross  e2e3 len     ---      dot   e1e2 "<<Pos::pos_dot(E_1E_2_cross_E_2E_3,E_1E_2)<<endl;
 
 
 		Pos N_ef = Pos::pos_mul( 1.0/a , Pos::pos_cross( E_1E_2_cross_E_2E_3 , E_1E_2 ) );
 
-		cout<<"N_ef     LEN : "<<Pos::pos_norm(N_ef)<<endl;
+		// cout<<"N_ef     LEN : "<<Pos::pos_norm(N_ef)<<endl;
 
 		Pos EF = Pos::pos_mul(EF_NORM,N_ef);//-------------------------------------------------------EF
 
 		Pos OF = Pos::pos_sum(OE,EF);//--------------------------------------------------------------OF
 
 		//Debug
-		cout<<"N_ef vec is : "<<endl;
-		Pos::pos_print(N_ef);
+		// cout<<"N_ef vec is : "<<endl;
+		// Pos::pos_print(N_ef);
 
-		cout<<"OF vec is : "<<endl;
-		Pos::pos_print(OF);
+		// cout<<"OF vec is : "<<endl;
+		// Pos::pos_print(OF);
 
-		cout<<"RRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRR"<<endl;
-		cout<<Pos::pos_norm(Pos::pos_sub(OF,OE_[0]))<<endl;
-		cout<<Pos::pos_norm(Pos::pos_sub(OF,OE_[1]))<<endl;
-		cout<<Pos::pos_norm(Pos::pos_sub(OF,OE_[2]))<<endl;
+		// cout<<"RRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRR"<<endl;
+		// cout<<Pos::pos_norm(Pos::pos_sub(OF,OE_[0]))<<endl;
+		// cout<<Pos::pos_norm(Pos::pos_sub(OF,OE_[1]))<<endl;
+		// cout<<Pos::pos_norm(Pos::pos_sub(OF,OE_[2]))<<endl;
 
 		Dfloat FO_NORM = sqrt( l2*l2 - E2F_NORM*E2F_NORM);
 
 		//Debug
-		cout<<"fo_ norm is : "<<FO_NORM<<endl;
+		// cout<<"fo_ norm is : "<<FO_NORM<<endl;
 
 
 		
@@ -246,16 +246,16 @@ struct Delta{
 
 		// cout<<"1/(a*b)"<<1/(a*b)<<endl;
 
-		cout<<"N_fo_  LEN : "<<Pos::pos_norm(N_fo_)<<endl;;
-		cout<<"N_fo_ vec is : "<<endl;
-		Pos::pos_print(N_fo_);
+		// cout<<"N_fo_  LEN : "<<Pos::pos_norm(N_fo_)<<endl;;
+		// cout<<"N_fo_ vec is : "<<endl;
+		// Pos::pos_print(N_fo_);
 
 		Pos FO_ = Pos::pos_mul( FO_NORM , N_fo_ );
 
 
 		//Debug
-		cout<<"FO_ vec is : "<<endl;
-		Pos::pos_print(FO_);
+		// cout<<"FO_ vec is : "<<endl;
+		// Pos::pos_print(FO_);
 
 
 
@@ -299,7 +299,7 @@ int main(){
 
 	
 	// test for inkin
-	Pos p1(100,200,-700);
+	Pos p1(0,0,-600);
 	Delta delta1(400,400,600,600);
 	delta1.inKin(p1);
 
@@ -322,13 +322,13 @@ int main(){
 	
 
 	//test for kin
-	Delta delta2(400,400,600,600);
-	delta2.set_kin_theta(delta1.in_theta[0]*PI/180,delta1.in_theta[1]*PI/180,delta1.in_theta[2]*PI/180);
-	delta2.kin();
-	cout<<"-----------------------"<<endl;
-	Pos::pos_print(delta2.kin_pos);
-	cout<<"-----------------------"<<endl;
-	cout<<delta1.in_theta[0]<<"   "<<delta1.in_theta[1]<<"   "<<delta1.in_theta[2]<<endl;
+	// Delta delta2(400,400,600,600);
+	// delta2.set_kin_theta(delta1.in_theta[0]*PI/180,delta1.in_theta[1]*PI/180,delta1.in_theta[2]*PI/180);
+	// delta2.kin();
+	// cout<<"-----------------------"<<endl;
+	// Pos::pos_print(delta2.kin_pos);
+	// cout<<"-----------------------"<<endl;
+	// cout<<delta1.in_theta[0]<<"   "<<delta1.in_theta[1]<<"   "<<delta1.in_theta[2]<<endl;
 	// cout<<PI<<endl;
 }
 */

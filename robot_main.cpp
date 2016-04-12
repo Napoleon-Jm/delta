@@ -3,6 +3,13 @@
 
 using namespace std;
 
+
+
+
+
+
+
+//big laji laji laji laji laji laji laji
 //PLC write algorithm read.
 #define PLC_IS_WRITE 0;//0x00000
 #define PLC_WRITE_COUNT 2//0X00002
@@ -16,6 +23,13 @@ using namespace std;
 #define ALG_IS_WRITE 262158;//0X40014
 #define ALG_WRITE_COUNT 262160;//0x40016
 #define ALG_WRITE_CONTENT 327680;//0x50000
+
+
+
+
+
+
+
 
 //base address of share memory
 const int ADD_BASE = 0x10000010;
