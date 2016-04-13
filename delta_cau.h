@@ -5,46 +5,66 @@
 #include <cmath>
 #include <iostream>
 
-
+//the type for delta_cau , you can change it if you need.
 typedef float Dfloat;
 using namespace std;
 
+//the const variable for PI.
+//the cmath pi is not stable for using.
 const Dfloat PI = 3.1415926;
 
+
+/*
+ *@Usage : Pos representation, include some operations for points
+ *       like, sub, sum, cross, dot, and so on.
+ *
+ *@Author : Wang Jimin
+ *@email : wangjimin.c@hotmail.com
+ *
+ */
 struct Pos{
 	Dfloat x;
 	Dfloat y;
 	Dfloat z;
+	//constructor
 	Pos():x(0.0),y(0.0),z(0.0){}
 	Pos(Dfloat X,Dfloat Y,Dfloat Z):x(X),y(Y),z(Z){}
+	//static function for points subtraction.
 	static Pos pos_sub(Pos p1,Pos p2)
 	{
 		return Pos(p1.x-p2.x,p1.y-p2.y,p1.z-p2.z);
 	}
+	//static function for points sum.
 	static Pos pos_sum(Pos p1,Pos p2)
 	{
 		return Pos(p1.x+p2.x,p1.y+p2.y,p1.z+p2.z);
 	}
+	//static function for point modular.
 	static Dfloat pos_norm(Pos p)
 	{
 		return sqrt(p.x*p.x+p.y*p.y+p.z*p.z);
 	}
+	//static function for point modular square.
 	static Dfloat pos_norm_2(Pos p)
 	{
 		return p.x*p.x+p.y*p.y+p.z*p.z;
 	}
+	//static function for vector cross product.
 	static Pos pos_cross(Pos p1,Pos p2)
 	{
 		return Pos(p1.y*p2.z-p1.z*p2.y,p1.z*p2.x-p1.x*p2.z,p1.x*p2.y-p1.y*p2.x);
 	}
+	//static function for vector dot product.
 	static Dfloat pos_dot(Pos p1,Pos p2)
 	{
 		return p1.x*p2.x + p1.y*p2.y + p1.z*p2.z;
 	}
+	//static function for vector multiplication.
 	static Pos pos_mul(Dfloat k,Pos p)
 	{
 		return Pos(k*p.x,k*p.y,k*p.z);
 	}
+	//static function for print points to dubug.
 	static void pos_print(Pos p)
 	{
 		cout<<"x = "<<p.x<<endl;
@@ -52,77 +72,96 @@ struct Pos{
 		cout<<"z = "<<p.z<<endl;
 	}
 };
-
+/*
+ *@Usage : Delta robot representation class, include some import function
+ *       like, kin and inkin kinematics algorithms.
+ *@Author : Wang Jimin
+ *@email : wangjimin.c@hotmail.com
+ *
+ *@Debeg : you can print debug info to define DEBUG_DELTA_CAU
+ */
 struct Delta{
+	/*
+	 *parm for delta robot,R,r,l1,l2.
+	*/
 	Dfloat R;
 	Dfloat r;
 	Dfloat alpha[3];
 	Dfloat l1;
 	Dfloat l2;
-	//use befor kin
+	//need to be set befor kin function.
 	Dfloat kin_theta[3];
 	Pos kin_pos;
-	//use befor in_kin function
+	//its result for inKin function.
 	Dfloat in_theta[3];
 	//E and P for draw l2
 	Pos E[3];
 	Pos P[3];
+	//constructor
 	Delta(Dfloat R_,Dfloat r_,Dfloat l1_,Dfloat l2_):R(R_),r(r_),l1(l1_),l2(l2_),kin_pos(Pos(0,0,0)){
 		for(int i = 0;i<3;i++)
 		{
 			alpha[i] = (4*(i+1)-3)*PI/6.0;
 		}
 	}
+	//set kin theta for kin function.
 	void set_kin_theta(Dfloat theta1,Dfloat theta2,Dfloat theta3){
 		kin_theta[0] = theta1;
 		kin_theta[1] = theta2;
 		kin_theta[2] = theta3;
 	}
+	//its called by kin function.
 	void f_kuv(Pos pos,Dfloat kuv[3][3]){
 		kuv[0][0] = l2*l2-l1*l1-pos.x*pos.x-pos.y*pos.y-pos.z*pos.z-(R-r)*(R-r)\
 				+(R-r)*(1.732*pos.x+pos.y)+2*pos.z*l1;
 
-		// Dfloat a = 2*pos.z*l1;
-		// // a = a/100.0;
-		// Dfloat b = l2*l2-l1*l1-pos.x*pos.x-pos.y*pos.y-pos.z*pos.z-(R-r)*(R-r)+(R-r)*(1.732*pos.x+pos.y);
-		// // b = b/100.0;
-		// cout<<"6666666666666666666666666: "<<2*pos.z*l1<<endl;
-		// cout<<"6666666666666666666666666: "<<(R-r)*(1.732*pos.x+pos.y)<<endl;
-		// cout<<"6666666666666666666666666: "<<(R-r)*(R-r)<<endl;
-		// cout<<"6666666666666666666666666: "<<pos.z*pos.z<<endl;
-		// cout<<"6666666666666666666666666: "<<pos.x*pos.x-pos.y*pos.y<<endl;
-		// cout<<"6666666666666666666666666: "<<l2*l2-l1*l1-pos.x*pos.x-pos.y*pos.y-pos.z*pos.z-(R-r)*(R-r)+(R-r)*(1.732*pos.x+pos.y)<<endl;
-		// cout<<"a:"<<a<<endl;
-		// cout<<"b:"<<b<<endl;
-		// cout<<"a+b: "<<a+b<<endl;
-		// cout<<"6666666666666666666666666: "<<kuv[0][0]<<endl;
+		#ifdef DEBUG_DELTA_CAU
+		Dfloat a = 2*pos.z*l1;
+		// a = a/100.0;
+		Dfloat b = l2*l2-l1*l1-pos.x*pos.x-pos.y*pos.y-pos.z*pos.z-(R-r)*(R-r)+(R-r)*(1.732*pos.x+pos.y);
+		// b = b/100.0;
+		cout<<"6666666666666666666666666: "<<2*pos.z*l1<<endl;
+		cout<<"6666666666666666666666666: "<<(R-r)*(1.732*pos.x+pos.y)<<endl;
+		cout<<"6666666666666666666666666: "<<(R-r)*(R-r)<<endl;
+		cout<<"6666666666666666666666666: "<<pos.z*pos.z<<endl;
+		cout<<"6666666666666666666666666: "<<pos.x*pos.x-pos.y*pos.y<<endl;
+		cout<<"6666666666666666666666666: "<<l2*l2-l1*l1-pos.x*pos.x-pos.y*pos.y-pos.z*pos.z-(R-r)*(R-r)+(R-r)*(1.732*pos.x+pos.y)<<endl;
+		cout<<"a:"<<a<<endl;
+		cout<<"b:"<<b<<endl;
+		cout<<"a+b: "<<a+b<<endl;
+		cout<<"6666666666666666666666666: "<<kuv[0][0]<<endl;
+		#endif
 
 		kuv[0][1] = -2*(2*(R-r)-1.732*pos.x-pos.y)*l1;
 		kuv[0][2] = kuv[0][0] - 4*pos.z*l1;
-		// return kuv1;
-	// }
-	// void f_kuv2(Pos pos,Dfloat kuv[]){
+
 		kuv[1][0] = l2*l2-l1*l1-pos.x*pos.x-pos.y*pos.y-pos.z*pos.z-(R-r)*(R-r)\
 				+(R-r)*(pos.y-1.732*pos.x)+2*pos.z*l1;
 		kuv[1][1] = -2*(2*(R-r)+1.732*pos.x-pos.y)*l1;
 		kuv[1][2] = kuv[1][0] - 4*pos.z*l1;
-		// return kuv1;
-	// }
-	// void f_kuv3(Pos pos,Dfloat kuv[]){
+
 		kuv[2][0] = l2*l2-l1*l1-pos.x*pos.x-pos.z*pos.z-(R-r+pos.y)*(R-r+pos.y)\
 				+2*pos.z*l1;
 		kuv[2][1] = -4*l1*(R-r+pos.y);
 		kuv[2][2] = kuv[2][0] - 4*pos.z*l1;
-		// return kuv;
-	}
 
+	}
+	/*
+	 *@Usage:inverse kinematics
+	 *
+	 *@parm : pos,the target position for inverse kinematics.
+	 *@result : the result of inverse kinematics function is saved in in_theta.
+	*/
 	void inKin(Pos pos){
 		Dfloat kuvs[3][3]={0.0};
 		f_kuv(pos,kuvs);
-		
-		// cout<<"--------------kuv1--- "<<kuvs[0][0]<<" *** "<<kuvs[0][1]<<" *** "<<kuvs[0][2]<<endl;
-		// cout<<"--------------kuv2--- "<<kuvs[1][0]<<" *** "<<kuvs[1][1]<<" *** "<<kuvs[1][2]<<endl;
-		// cout<<"--------------kuv3--- "<<kuvs[2][0]<<" *** "<<kuvs[2][1]<<" *** "<<kuvs[2][2]<<endl;
+
+		#ifdef DEBUG_DELTA_CAU
+		cout<<"--------------kuv1--- "<<kuvs[0][0]<<" *** "<<kuvs[0][1]<<" *** "<<kuvs[0][2]<<endl;
+		cout<<"--------------kuv2--- "<<kuvs[1][0]<<" *** "<<kuvs[1][1]<<" *** "<<kuvs[1][2]<<endl;
+		cout<<"--------------kuv3--- "<<kuvs[2][0]<<" *** "<<kuvs[2][1]<<" *** "<<kuvs[2][2]<<endl;
+		#endif
+
 		Dfloat t;
 		for(int i = 0;i<3;i++)
 		{
@@ -139,7 +178,11 @@ struct Delta{
 		}
 
 	}
-
+	/*
+	 *@Usage:forward kinematics function
+	 *
+	 *@result:the forward kinematics fuction result is saved in kin_pos.
+	*/
 	void kin(){
 		Pos v_OE[3];
 		Pos PO_[3];
@@ -152,32 +195,40 @@ struct Delta{
 
 		}
 
-		// for(auto i:v_OE)
-		// {
-		// 	cout<<"&&&&&&&&&&&&&&&  OE  "<<endl;
-		// 	Pos::pos_print(i);
-		// }
 
-		//Debug
-		// for(auto i:OE_)
-		// {
-		// 	cout<<"&&&&&&&&&&&&&&&  OE_ "<<endl;
-		// 	Pos::pos_print(i);
-		// }
+		#ifdef DEBUG_DELTA_CAU
+		for(auto i:v_OE)
+		{
+			cout<<"&&&&&&&&&&&&&&&  OE  "<<endl;
+			Pos::pos_print(i);
+		}
+
+		Debug
+		for(auto i:OE_)
+		{
+			cout<<"&&&&&&&&&&&&&&&  OE_ "<<endl;
+			Pos::pos_print(i);
+		}
+		#endif
+
 
 		Pos OE = Pos::pos_mul(0.5,Pos::pos_sum(OE_[0],OE_[1]));//----------------------------------OE
-		//Debug
-		// cout<<"---OE---"<<endl;
-		// Pos::pos_print(OE);
+
+		#ifdef DEBUG_DELTA_CAU
+		cout<<"---OE---"<<endl;
+		Pos::pos_print(OE);
+		#endif
+
 		Pos E_1E_2 = Pos::pos_sub(OE_[1],OE_[0]);
 		Pos E_3E_1 = Pos::pos_sub(OE_[0],OE_[2]);
 		Pos E_2E_3 = Pos::pos_sub(OE_[2],OE_[1]);
 
-		//Debug
-		// cout<<"---e1e2e3---"<<endl;
-		// Pos::pos_print(E_1E_2);
-		// Pos::pos_print(E_3E_1);
-		// Pos::pos_print(E_2E_3);
+		#ifdef DEBUG_DELTA_CAU
+		cout<<"---e1e2e3---"<<endl;
+		Pos::pos_print(E_1E_2);
+		Pos::pos_print(E_3E_1);
+		Pos::pos_print(E_2E_3);
+		#endif
 
 
 		Dfloat a = Pos::pos_norm(E_1E_2);
@@ -216,17 +267,18 @@ struct Delta{
 
 		Pos OF = Pos::pos_sum(OE,EF);//--------------------------------------------------------------OF
 
-		//Debug
-		// cout<<"N_ef vec is : "<<endl;
-		// Pos::pos_print(N_ef);
+		#ifdef DEBUG_DELTA_CAU
+		cout<<"N_ef vec is : "<<endl;
+		Pos::pos_print(N_ef);
 
-		// cout<<"OF vec is : "<<endl;
-		// Pos::pos_print(OF);
+		cout<<"OF vec is : "<<endl;
+		Pos::pos_print(OF);
 
-		// cout<<"RRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRR"<<endl;
-		// cout<<Pos::pos_norm(Pos::pos_sub(OF,OE_[0]))<<endl;
-		// cout<<Pos::pos_norm(Pos::pos_sub(OF,OE_[1]))<<endl;
-		// cout<<Pos::pos_norm(Pos::pos_sub(OF,OE_[2]))<<endl;
+		cout<<"RRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRR"<<endl;
+		cout<<Pos::pos_norm(Pos::pos_sub(OF,OE_[0]))<<endl;
+		cout<<Pos::pos_norm(Pos::pos_sub(OF,OE_[1]))<<endl;
+		cout<<Pos::pos_norm(Pos::pos_sub(OF,OE_[2]))<<endl;
+		#endif
 
 		Dfloat FO_NORM = sqrt( l2*l2 - E2F_NORM*E2F_NORM);
 
@@ -238,24 +290,26 @@ struct Delta{
 		Pos N_fo_ = Pos::pos_mul( -1.0/(a*c*sin_1) , Pos::pos_cross(E_1E_2,E_2E_3) );
 
 		//Debug
+		#ifdef DEBUG_DELTA_CAU
+		cout<<"e3e1 e1e2 cross is : "<<endl;
+		Pos::pos_print(Pos::pos_cross(E_3E_1,E_1E_2));
 
-		// cout<<"e3e1 e1e2 cross is : "<<endl;
-		// Pos::pos_print(Pos::pos_cross(E_3E_1,E_1E_2));
+		cout<<"cross .z * 1/(a*b) : "<<( -1.0/(a*b) )*Pos::pos_cross(E_3E_1,E_1E_2).z<<endl;
 
-		// cout<<"cross .z * 1/(a*b) : "<<( -1.0/(a*b) )*Pos::pos_cross(E_3E_1,E_1E_2).z<<endl;
+		cout<<"1/(a*b)"<<1/(a*b)<<endl;
 
-		// cout<<"1/(a*b)"<<1/(a*b)<<endl;
-
-		// cout<<"N_fo_  LEN : "<<Pos::pos_norm(N_fo_)<<endl;;
-		// cout<<"N_fo_ vec is : "<<endl;
-		// Pos::pos_print(N_fo_);
+		cout<<"N_fo_  LEN : "<<Pos::pos_norm(N_fo_)<<endl;;
+		cout<<"N_fo_ vec is : "<<endl;
+		Pos::pos_print(N_fo_);
+		#endif
 
 		Pos FO_ = Pos::pos_mul( FO_NORM , N_fo_ );
 
 
-		//Debug
-		// cout<<"FO_ vec is : "<<endl;
-		// Pos::pos_print(FO_);
+		#ifdef DEBUG_DELTA_CAU
+		cout<<"FO_ vec is : "<<endl;
+		Pos::pos_print(FO_);
+		#endif
 
 
 
@@ -263,6 +317,15 @@ struct Delta{
 
 		
 	}
+
+	/*
+	 *@Usage : calculate E and P vector
+	 *
+	 *@pram : theta, the degree theta between l1 and R.
+	 *@pram : p, the end point of delta, to calculate P.
+	 *
+	 *@result : saved in P and E.
+	*/
 
 	void calculate_l2_endpoint(Dfloat *theta,Pos p){
 		for(int i = 0;i < 3;i++){
@@ -273,7 +336,14 @@ struct Delta{
 			P[i] = Pos(r*cos(alpha[i])+p.x , r*sin(alpha[i])+p.y , p.z);
 		}
 	}
-
+	/*
+	 *@Usage : calculate length of l2, maybe used for verifing the algorithm.
+	 *
+	 *@pram : theta, for function calculate_l2_endpoint.
+	 *@parm : p, for function calculate_l2_endpoint.
+	 *@pram : lenL2, used for save result.
+	 *
+	*/
 	void len_l2(Dfloat *theta,Pos p,Dfloat *lenL2)
 	{
 		calculate_l2_endpoint(theta,p);
@@ -283,7 +353,7 @@ struct Delta{
 			lenL2[i] = Pos::pos_norm(Pos::pos_sub(P[i],E[i]));
 		}
 	}
-
+	//for debug to print degree, d is rad measure,print is degree measure.
 	static void print_degree(Dfloat *d){
 		cout<<"Degree -----------------------"<<endl;
 		cout<<d[0]*180/PI<<" "<<d[1]*180/PI<<" "<<d[2]*180/PI<<endl;
@@ -294,6 +364,8 @@ struct Delta{
 #endif
 
 
+
+//test function for debug independent.
 /*
 int main(){
 

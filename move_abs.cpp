@@ -1,10 +1,10 @@
 #include "delta_cau.h"
 #include <cmath>
 #include <iostream>
+#include "move_abs.h"
 
-typedef unsigned int dig_uni;
-typedef float ana_uni;
 
+#define DEBUG_MOVE_ABS
 
 ana_uni fromDigCodeToRad(dig_uni digCode,dig_uni codeBitNum){
 	return digCode/pow(2,codeBitNum)*2*PI;
@@ -15,8 +15,8 @@ dig_uni fromRadToDigCode(ana_uni rad,dig_uni codeBitNum){
 }
 
 /*
- *@Usage : generate a path for move absolute
- *
+ *@Usage : generate a path for move absolute, if yor want to print
+ *		   debug infomation, you need to define DEBUG_MOVE_ABS
  *
  *@parm x,y,z : target position
  *@parm axis1,axis2,axis3 : actual position
@@ -33,38 +33,42 @@ dig_uni* delta_move_abs_path(ana_uni x,ana_uni y,ana_uni z,
 	dig_uni accPathNum,dig_uni conVelPathNum){
 
 	Delta delta(400,400,600,600);
-	//release
+
 	delta.set_kin_theta(fromDigCodeToRad(axis1,13),fromDigCodeToRad(axis2,13),fromDigCodeToRad(axis3,13));
-	//debug
-	// #ifdef DEBUG
-	// delta.set_kin_theta(axis1,axis2,axis3);
-	// #endif
+
+	
 	delta.kin();
+
+	#ifdef DEBUG_MOVE_ABS
 	cout<<"***************** start point **********************"<<endl;
 	Pos::pos_print(delta.kin_pos);
 	cout<<"***************** *********** **********************"<<endl;
+	#endif
 
 	int path_size = 2*accPathNum+conVelPathNum;
 	ana_uni *path = new ana_uni[path_size];
 	dig_uni *dig_path = new dig_uni[path_size*3];
 	ana_uni vel = 0.85*maxVel;
 	ana_uni acc = 0.85*maxAcc;
-
+	#ifdef DEBUG_MOVE_ABS
 	cout<<"vel : "<<vel<<"  acc : "<<acc<<endl;
+	#endif
 
 	ana_uni t_acc = vel/acc;
 	ana_uni t_del = t_acc/accPathNum;
-
+	#ifdef DEBUG_MOVE_ABS
 	cout<<"t_acc : "<<t_acc<<"  t_del : "<<t_del<<endl;
+	#endif
 
 	ana_uni distance = Pos::pos_norm(Pos::pos_sub(Pos(x,y,z),delta.kin_pos));
 	Pos dis_unit = Pos::pos_mul(1/distance,Pos::pos_sub(Pos(x,y,z),delta.kin_pos));
-
+	#ifdef DEBUG_MOVE_ABS
 	cout<<"distance : "<<distance<<endl;
 
 	cout<<"distance unit : ****************************"<<endl;
 	Pos::pos_print(dis_unit);
 	cout<<"distance unit : ****************************"<<endl;
+	#endif
 
 	// path[0] = t_del*t_del*acc/2;
 
@@ -73,22 +77,26 @@ dig_uni* delta_move_abs_path(ana_uni x,ana_uni y,ana_uni z,
 	for(int i = 0;i<accPathNum;i++){
 		path[i] = 0.5*acc*pow((i+1)*t_del,2);
 	}
+	#ifdef DEBUG_MOVE_ABS
 	cout<<"acc t0 distance : "<<path[0]<<endl;
+	#endif
 
 	ana_uni distance_delta = (distance-t_acc*vel)/conVelPathNum;
 
 	//total distance for acceleration period
 	ana_uni distance_acc = path[accPathNum-1];
-
+	#ifdef DEBUG_MOVE_ABS
 	cout<<"distance_delta : "<<distance_delta<<"  distance_acc : "<<distance_acc<<endl;
+	#endif
 
 	for(int i = accPathNum;i<accPathNum+conVelPathNum;i++){
 		path[i] = distance_acc+(i-accPathNum+1)*distance_delta;
 	}
 	//total distance for acceleration and const velocity period
 	ana_uni distance_acc_vel = path[accPathNum+conVelPathNum-1];
-
+	#ifdef DEBUG_MOVE_ABS
 	cout<<"distance_acc_vel : "<<distance_acc_vel<<endl;
+	#endif
 
 	for(int i = accPathNum+conVelPathNum,j = accPathNum-1;i<path_size;i++){
 		path[i] = path[i-1]+path[j]-path[j-1];
@@ -106,12 +114,12 @@ dig_uni* delta_move_abs_path(ana_uni x,ana_uni y,ana_uni z,
 	}
 
 	// Pos::pos_print(delta.kin_pos);
-
+	#ifdef DEBUG_MOVE_ABS
 	for(int i = 0;i < path_size;i++){
 		Pos p = Pos::pos_sum(delta.kin_pos,Pos::pos_mul(path[i],dis_unit));
 		cout<<p.x<<"  "<<p.y<<"  "<<p.z<<endl;
 	}
-
+	#endif
 	delete[] path;
 
 	return dig_path;
@@ -120,11 +128,11 @@ dig_uni* delta_move_abs_path(ana_uni x,ana_uni y,ana_uni z,
 
 
 /*
- *test
+ *test function
  */
 
 int main(){
-	// #define DEBUG
+	
 	float x = 400;
 	float y = 400;
 	float z = -600;

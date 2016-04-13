@@ -47,9 +47,18 @@ void move_func(Pos *p)
   // printf("move func is successed, and %s\n",(char *)thread_result);
 }*/
 
+
+/*
+ *@Usage : the whole file is to implement the simulation for delta algotithm.
+ *         the framework is standard OpenGL framework, and the window manager
+           use glut.
+           if you want to complie this file, please use makefile.w 
+ *@Author : Wang Jimin
+ *@email : wangjimin.c@hotmail.com
+ *
+ */
 int main(int argc, char** argv)
 {
-  
   glutInit(&argc, argv);
   glutInitDisplayMode (GLUT_DOUBLE | GLUT_RGB);
   glutInitWindowSize (500, 500); 
