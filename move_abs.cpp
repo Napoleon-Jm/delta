@@ -1,23 +1,31 @@
-#include "delta_cau.h"
-#include <cmath>
-#include <iostream>
 #include "move_abs.h"
 
 
 #define DEBUG_MOVE_ABS
 
+
+//to calculate 2 pow of y.
+dig_uni m_pow(dig_uni y){
+	dig_uni x = 1;
+	for(dig_uni i = 0;i < y;i++){
+		x = x<<1;
+	}
+	return x;
+}
+
 ana_uni fromDigCodeToRad(dig_uni digCode,dig_uni codeBitNum){
-	return digCode/pow(2,codeBitNum)*2*PI;
+	return ana_uni(digCode)/m_pow(codeBitNum)*2*PI;//ana_uni() is import.
 }
 
 dig_uni fromRadToDigCode(ana_uni rad,dig_uni codeBitNum){
-	return rad/2/PI*pow(2,codeBitNum);
+	return rad/2/PI*m_pow(codeBitNum);
 }
 
 /*
  *@Usage : generate a path for move absolute, if yor want to print
  *		   debug infomation, you need to define DEBUG_MOVE_ABS
  *
+ *@parm delta : the robot object delta.
  *@parm x,y,z : target position
  *@parm axis1,axis2,axis3 : actual position
  *@parm maxVel : max speed
@@ -27,12 +35,12 @@ dig_uni fromRadToDigCode(ana_uni rad,dig_uni codeBitNum){
  *
  *
  */
-dig_uni* delta_move_abs_path(ana_uni x,ana_uni y,ana_uni z,
+dig_uni* delta_move_abs_path(Delta &delta,ana_uni x,ana_uni y,ana_uni z,
 	dig_uni axis1,dig_uni axis2,dig_uni axis3,
 	ana_uni maxVel,ana_uni maxAcc,
 	dig_uni accPathNum,dig_uni conVelPathNum){
 
-	Delta delta(400,400,600,600);
+	// Delta delta(400,400,600,600);
 
 	delta.set_kin_theta(fromDigCodeToRad(axis1,13),fromDigCodeToRad(axis2,13),fromDigCodeToRad(axis3,13));
 
@@ -132,7 +140,12 @@ dig_uni* delta_move_abs_path(ana_uni x,ana_uni y,ana_uni z,
  */
 
 int main(){
-	
+	// cout<<m_pow(5)<<endl;
+	// float i = 1111111111.0f;
+	// cout<<i<<endl;
+	// cout<<fromDigCodeToRad(1,1)<<endl;
+
+	Delta delta(400,400,600,600);
 	float x = 400;
 	float y = 400;
 	float z = -600;
@@ -143,7 +156,7 @@ int main(){
 	float maxAcc = 1;
 	dig_uni accPathNum = 3;
 	dig_uni conVelPathNum = 4;
-	unsigned int *test = delta_move_abs_path(x,y,z,fromRadToDigCode(axis1,13),fromRadToDigCode(axis2,13),fromRadToDigCode(axis3,13),maxVel,maxAcc,accPathNum,conVelPathNum);
+	unsigned int *test = delta_move_abs_path(delta,x,y,z,fromRadToDigCode(axis1,13),fromRadToDigCode(axis2,13),fromRadToDigCode(axis3,13),maxVel,maxAcc,accPathNum,conVelPathNum);
 	int path_size = (2*accPathNum + conVelPathNum)*3;
 	// for(int i = 0;i < path_size;){
 	// 	cout<<"x : "<<test[i++]<<"  y : "<<test[i++]<<"  z : "<<test[i++]<<endl;

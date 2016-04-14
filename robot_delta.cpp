@@ -2,7 +2,7 @@
 #include <unistd.h>
 #include <GL/glut.h>
 #include <pthread.h>
-#include "delta_cau.h"
+#include "delta_cal.h"
 
 
 Pos pos(0.0,0.0,-1000);//work pos

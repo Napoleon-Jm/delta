@@ -1,6 +1,10 @@
 #ifndef MOVE_ABS
 #define MOVE_ABS
 
+#include "delta_cal.h"
+#include <cmath>
+#include <iostream>
+
 typedef unsigned int dig_uni;
 typedef float ana_uni;
 
