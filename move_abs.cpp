@@ -21,6 +21,15 @@ dig_uni fromRadToDigCode(ana_uni rad,dig_uni codeBitNum){
 	return rad/2/PI*m_pow(codeBitNum);
 }
 
+//Do not forget to delete the return pointer
+dig_uni* fromRadsToDigCodes(ana_uni* rads,dig_uni len,dig_uni codeBitNum){
+	dig_uni* dig_path = new dig_uni[len];
+	for(int i = 0;i < len;i++){
+		dig_path[i] = fromRadToDigCode(rads[i],codeBitNum);
+	}
+	return dig_path;
+}
+
 /*
  *@Usage : generate a path for move absolute, if yor want to print
  *		   debug infomation, you need to define DEBUG_MOVE_ABS
@@ -33,9 +42,9 @@ dig_uni fromRadToDigCode(ana_uni rad,dig_uni codeBitNum){
  *@parm accPathNum : acceleration path size
  *@parm conVelPathNum : const velocity path size
  *
- *
+ *NOTE : Do not forget delete the return pointer...
  */
-dig_uni* delta_move_abs_path(Delta &delta,ana_uni x,ana_uni y,ana_uni z,
+ana_uni* delta_move_abs_path(Delta &delta,ana_uni x,ana_uni y,ana_uni z,
 	dig_uni axis1,dig_uni axis2,dig_uni axis3,
 	ana_uni maxVel,ana_uni maxAcc,
 	dig_uni accPathNum,dig_uni conVelPathNum){
@@ -55,7 +64,7 @@ dig_uni* delta_move_abs_path(Delta &delta,ana_uni x,ana_uni y,ana_uni z,
 
 	int path_size = 2*accPathNum+conVelPathNum;
 	ana_uni *path = new ana_uni[path_size];
-	dig_uni *dig_path = new dig_uni[path_size*3];
+	ana_uni *ana_path = new ana_uni[path_size*3];//debug the type is ana_uni, release the type is dig_uni
 	ana_uni vel = 0.85*maxVel;
 	ana_uni acc = 0.85*maxAcc;
 	#ifdef DEBUG_MOVE_ABS
@@ -112,13 +121,19 @@ dig_uni* delta_move_abs_path(Delta &delta,ana_uni x,ana_uni y,ana_uni z,
 	}
 
 
-	for(int i = 0;i<path_size*3;){
-		Pos p = Pos::pos_sum(delta.kin_pos,Pos::pos_mul(path[i],dis_unit));
-		// cout<<p.x<<"  "<<p.y<<"  "<<p.z<<endl;
+	for(int i = 0,j = 0;i<path_size*3;){
+		Pos p = Pos::pos_sum(delta.kin_pos,Pos::pos_mul(path[j],dis_unit));
+		cout<<p.x<<"  "<<p.y<<"  "<<p.z<<" in for "<<endl;
 		delta.inKin( p );
-		dig_path[i++] = delta.in_theta[0];
-		dig_path[i++] = delta.in_theta[1];
-		dig_path[i++] = delta.in_theta[3];
+		cout<<"in_theta in for"<<endl;
+		cout<<delta.in_theta[0]<<" "<<delta.in_theta[1]<<" "<<delta.in_theta[2]<<endl;
+		ana_path[i] = delta.in_theta[0];
+		i++;
+		ana_path[i] = delta.in_theta[1];
+		i++;
+		ana_path[i] = delta.in_theta[2];//fuck my fault.ana_path[i++] = delta.in_theta[3];
+		i++;
+		j++;
 	}
 
 	// Pos::pos_print(delta.kin_pos);
@@ -130,7 +145,7 @@ dig_uni* delta_move_abs_path(Delta &delta,ana_uni x,ana_uni y,ana_uni z,
 	#endif
 	delete[] path;
 
-	return dig_path;
+	return ana_path;
 
 }
 
@@ -156,9 +171,19 @@ int main(){
 	float maxAcc = 1;
 	dig_uni accPathNum = 3;
 	dig_uni conVelPathNum = 4;
-	unsigned int *test = delta_move_abs_path(delta,x,y,z,fromRadToDigCode(axis1,13),fromRadToDigCode(axis2,13),fromRadToDigCode(axis3,13),maxVel,maxAcc,accPathNum,conVelPathNum);
+	ana_uni *test = delta_move_abs_path(delta,x,y,z,fromRadToDigCode(axis1,13),fromRadToDigCode(axis2,13),fromRadToDigCode(axis3,13),maxVel,maxAcc,accPathNum,conVelPathNum);
 	int path_size = (2*accPathNum + conVelPathNum)*3;
-	// for(int i = 0;i < path_size;){
-	// 	cout<<"x : "<<test[i++]<<"  y : "<<test[i++]<<"  z : "<<test[i++]<<endl;
-	// }
+	cout<<"--------------axis rad------------"<<endl;
+	for(int i = 0;i < path_size;i = i+3){
+		cout<<"axis1 : "<<test[i]<<"  axis2 : "<<test[i+1]<<"  axis3 : "<<test[i+2]<<endl;
+	}
+	dig_uni *dig_path = fromRadsToDigCodes(test,path_size,13);
+	cout<<"--------------axis dig code------------"<<endl;
+	for(int i = 0;i < path_size;i = i+3){
+		cout<<"axis1 : "<<dig_path[i]<<"  axis2 : "<<dig_path[i+1]<<"  axis3 : "<<dig_path[i+2]<<endl;
+	}
+
+
+	delete[] test;
+	delete[] dig_path;
 }

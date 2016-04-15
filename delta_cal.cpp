@@ -1,5 +1,7 @@
 #include "delta_cal.h"
 
+#define DEBUG_DELTA_CAL
+
 void Delta::inKin(Pos pos){
 	Dfloat kuvs[3][3]={0.0};
 	f_kuv(pos,kuvs);
@@ -77,6 +79,12 @@ void Delta::kin(){
 	Dfloat a = Pos::pos_norm(E_1E_2);
 	Dfloat b = Pos::pos_norm(E_3E_1);
 	Dfloat c = Pos::pos_norm(E_2E_3);
+
+	//theta0 = theta1 = theta2 == 0.
+	if(a<0.00001 && b<0.00001 && c<0.00001){
+		kin_pos = Pos(0,0,-(l1+l2));
+		return;
+	}
 
 	//Debug
 	// cout<<"---length of e1e2e3---"<<endl;
