@@ -5,9 +5,12 @@ Delta kinematics algorithm and OpenGL simulation.
 **main files :** 
 ***
 
-* delta_cau.h : 
+* delta_cal.h : 
 
 	Core kinematics algorithm file.
+* delta_cal.cpp:
+
+	Core kinematics algorithm implementation file.
 
 * robot_delta.cpp : 
 
