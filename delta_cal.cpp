@@ -41,19 +41,19 @@ void Delta::kin(){
 	}
 
 
-	#ifdef DEBUG_DELTA_CAL
-	for(auto i:v_OE)
-	{
-		cout<<"&&&&&&&&&&&&&&&  OE  "<<endl;
-		Pos::pos_print(i);
-	}
+	#ifdef DEBUG_DELTA_CALz
+	// for(auto i:v_OE)
+	// {
+	// 	cout<<"&&&&&&&&&&&&&&&  OE  "<<endl;
+	// 	Pos::pos_print(i);
+	// }
 
 
-	for(auto i:OE_)
-	{
-		cout<<"&&&&&&&&&&&&&&&  OE_ "<<endl;
-		Pos::pos_print(i);
-	}
+	// for(auto i:OE_)
+	// {
+	// 	cout<<"&&&&&&&&&&&&&&&  OE_ "<<endl;
+	// 	Pos::pos_print(i);
+	// }
 	#endif
 
 
