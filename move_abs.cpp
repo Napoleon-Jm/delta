@@ -149,7 +149,7 @@ ana_uni* delta_move_abs_path(Delta &delta,ana_uni x,ana_uni y,ana_uni z,
 
 }
 
-ana_uni* delta_move_abs_circle_path(Delta &delta,ana_uni x2,ana_uni y2,ana_uni z2,
+ana_uni* delta_move_abs_circle_path(Delta &delta, ana_uni x2,ana_uni y2,ana_uni z2,
 	ana_uni x3,ana_uni y3,ana_uni z3,
 	dig_uni axis1,dig_uni axis2,dig_uni axis3,
 	dig_uni pathNum){
@@ -165,6 +165,10 @@ ana_uni* delta_move_abs_circle_path(Delta &delta,ana_uni x2,ana_uni y2,ana_uni z
 	Pos p1(delta.kin_pos);
 	Pos p2(x2,y2,z2);
 	Pos p3(x3,y3,z3);
+
+	// cout<<"p1----------------"<<endl;
+	// Pos::pos_print(p1);
+	Log::log_d("p1",p1);
 
 	m_uni A1 = (p1.y-p3.y)*(p2.z-p3.z)-(p2.y-p3.y)*(p1.z-p3.z);
 	m_uni B1 = (p2.x-p3.x)*(p2.z-p3.z)-(p1.x-p3.x)*(p2.z-p3.z);
@@ -213,42 +217,83 @@ ana_uni* delta_move_abs_circle_path(Delta &delta,ana_uni x2,ana_uni y2,ana_uni z
 
 
 	m_uni T_inv[MATRIX_R_4][MATRIX_C_4] = {
-		{T[0][0],T[1][0],T[2][0],t03},
-		{T[0][1],T[1][1],T[2][1],t13},
-		{T[0][2],T[1][2],T[2][2],t23},
+		{T[0][0],T[1][0],T[2][0],-t03},
+		{T[0][1],T[1][1],T[2][1],-t13},
+		{T[0][2],T[1][2],T[2][2],-t23},
 		{0,0,0,1},
 	};
+
+	matrix_print(T_inv,MATRIX_R_4,4);
 
 	m_uni r = Pos::pos_norm(Pos::pos_sub(Pos(matrix[0][3],matrix[1][3],matrix[2][3]),p1));
 
 	cout<<"r: "<<r<<endl;
+	Log::log_d("r",r);
 
-	Pos p1_q(getTwoDimensionalPointFromThreeDiment(p1,T_inv));
-	Pos p2_q(getTwoDimensionalPointFromThreeDiment(p2,T_inv));
-	Pos p3_q(getTwoDimensionalPointFromThreeDiment(p3,T_inv));
+	Pos p1_q = TMultiP(T_inv,p1);
+	Pos p2_q = TMultiP(T_inv,p2);
+	Pos p3_q = TMultiP(T_inv,p3);
 
-	int pathNum1 = pathNum*(p2_q.x-p1_q.x)/(p3_q.x-p1_q.x);
+	cout<<"p_q-------------------"<<endl;
+
+	Pos::pos_print(p1_q);
+	Pos::pos_print(p2_q);
+	Pos::pos_print(p3_q);
+
+	Log::log_d("p1_q",p1_q);
+	Log::log_d("p2_q",p2_q);
+	Log::log_d("p3_q",p3_q);
+
+	int pathNum1 = pathNum*(p2_q.x-p1_q.x)/(p3_q.x-p1_q.x)+0.5;
+
+	Log::log_d("pathNum1",pathNum1);
+
 	int pathNum2 = pathNum-pathNum1;
 
+
+
 	int dir = (p2_q.y-p1_q.y)>0?1:-1;
+
+
 	ana_uni delta_x = (p2_q.x-p1_q.x)/pathNum1;
+
+	Log::log_d("delta_x1",delta_x);
+
 	int index = 0;
-	for(index = 0;index < pathNum1;){
-		ana_path[index] = p1_q.x+delta_x*index;
-		ana_path[index+1] = sqrt(r*r-ana_path[index]*ana_path[index])*dir;
+	int cnt = 0;
+	ana_uni max = p1.y>p2.y?p1.y:p2.y;
+	ana_uni min = p1.y>p2.y?p2.y:p1.y;
+	ana_uni y = 0;
+	for(index = 0;index < pathNum1*3;cnt++){
+		ana_path[index] = p1_q.x+delta_x*(cnt+1);
+		y = ana_path[index+1] = sqrt(r*r-ana_path[index]*ana_path[index]);
+		if(y < min-0.8 || y > max+0.8)
+			ana_path[index+1] = -y;
 		ana_path[index+2] = 0;
 		index+=3;
 	}
 
 	delta_x = (p3_q.x-p2_q.x)/pathNum2;
+
+	Log::log_d("delta_x2",delta_x);
+
 	dir = (p3_q.y-p2_q.y)>0?1:-1;
 
-	for(int i = index,j = 0;i<pathNum2;j++){
-		ana_path[i] = p2_q.x+delta_x*j;
-		ana_path[i+1] = sqrt(r*r-ana_path[i]*ana_path[i])*dir;
+	max = p3.y>p2.y?p3.y:p2.y;
+	min = p3.y>p2.y?p2.y:p3.y;
+	y = 0;
+
+	cnt = 0;
+	for(int i = index;i<pathNum*3;cnt++){
+		ana_path[i] = p2_q.x+delta_x*(cnt+1);
+		y = ana_path[i+1] = sqrt(r*r-ana_path[i]*ana_path[i]);
+		if(y < min-0.8 || y > max+0.8)
+			ana_path[i+1] = -y;
 		ana_path[i+2] = 0;
 		i+=3;
 	}
+
+	Log::log_d("two dimen coord path",ana_path,pathNum);
 	// Pos p1_q(-400,0,0);
 	// Pos p2_q(0,400,0);
 	// Pos p3_q(400,0,0);
@@ -267,8 +312,8 @@ ana_uni* delta_move_abs_circle_path(Delta &delta,ana_uni x2,ana_uni y2,ana_uni z
 
 
 /*
- *test function
- */
+ *test function for delta_move_abs_path.
+ 
 
 int main(){
 	// cout<<m_pow(5)<<endl;
@@ -302,4 +347,32 @@ int main(){
 
 	delete[] test;
 	delete[] dig_path;
+}
+*/
+
+/*
+	test function for delta_move_abs_circle_path
+ */
+
+int main(){
+	int pathNum = 10;
+
+	Pos p1(0,0,-600);
+	Pos p2(400,400,-600);
+	Pos p3(800,0,-600);
+
+	float axis1 = PI/3;
+	float axis2 = PI/3;
+	float axis3 = PI/3;
+
+	Delta delta(400,400,600,600);
+
+	ana_uni *path = delta_move_abs_circle_path(delta, p2.x, p2.y, p2.z,
+	p3.x, p3.y, p3.z,
+	fromRadToDigCode(axis1,13),fromRadToDigCode(axis2,13),fromRadToDigCode(axis3,13),
+	pathNum);
+
+	for(int i = 0;i < pathNum*3;i+=3){
+		cout<<path[i]<<"  "<<path[i+1]<<"  "<<path[i+2]<<endl;
+	}
 }

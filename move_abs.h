@@ -5,9 +5,10 @@
 #include <cmath>
 #include <iostream>
 #include "tools.h"
+#include "log.h"
 
 typedef unsigned int dig_uni;
-typedef float ana_uni;
+typedef double ana_uni;
 
 ana_uni fromDigCodeToRad(dig_uni digCode,dig_uni codeBitNum);
 
