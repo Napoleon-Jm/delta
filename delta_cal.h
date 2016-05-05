@@ -9,7 +9,7 @@
 // #define DEBUG_DELTA_CAL
 
 //the type for delta_cau , you can change it if you need.
-typedef float Dfloat;
+typedef double Dfloat;
 using namespace std;
 
 //the const variable for PI.

@@ -1,6 +1,6 @@
 #include "delta_cal.h"
 
-#define DEBUG_DELTA_CAL
+// #define DEBUG_DELTA_CAL
 
 void Delta::inKin(Pos pos){
 	Dfloat kuvs[3][3]={0.0};
