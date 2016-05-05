@@ -123,8 +123,40 @@ void coordTransformationMatrix(m_uni T[][MATRIX_C_4],
 
 }
 
+void getT_inv(m_uni T[][MATRIX_C_4],m_uni T_inv[][MATRIX_C_4],
+	m_uni x0, m_uni y0, m_uni z0){
+	T_inv[0][0] = T[0][0];
+	T_inv[0][1] = T[1][0];
+	T_inv[0][2] = T[2][0];
+
+	T_inv[1][0] = T[0][1];
+	T_inv[1][1] = T[1][1];
+	T_inv[1][2] = T[2][1];
+
+	T_inv[2][0] = T[0][2];
+	T_inv[2][1] = T[1][2];
+	T_inv[2][2] = T[2][2];
+
+	T_inv[3][0] = T_inv[3][1] = T_inv[3][2] = 0;
+
+	T_inv[0][3] = -(T[0][0]*x0+T[1][0]*y0+T[2][0]*z0);
+	T_inv[1][3] = -(T[0][1]*x0+T[1][1]*y0+T[2][1]*z0);
+	T_inv[2][3] = -(T[0][2]*x0+T[1][2]*y0+T[2][2]*z0);
+
+	T_inv[3][3] = 1;
+}
+
+//4x4 T, p(Pos,1)
+Pos TMultiP(m_uni T[][MATRIX_C_4],Pos p){
+	m_uni pos[3];
+	for(int i = 0;i<3;i++){
+		pos[i] = T[i][0]*p.x+T[i][1]*p.y+T[i][2]*p.z+T[i][3];
+	}
+	return Pos(pos[0],pos[1],pos[2]);
+}
 
 
+/*
 
 int main(){
 
@@ -206,5 +238,16 @@ int main(){
 	m_uni r = Pos::pos_norm(Pos::pos_sub(Pos(matrix[0][3],matrix[1][3],matrix[2][3]),p1));
 
 	cout<<"r: "<<r<<endl;
+
+	T_inv[MATRIX_R_4][MATRIX_C_4];
+	getT_inv(T,T_inv,matrix[0][3],matrix[1][3],matrix[2][3]);
+
+	matrix_print(T_inv,4,4);
+
+	Pos::pos_print(TMultiP(T,p1));
+	Pos::pos_print(TMultiP(T,p2));
+	Pos::pos_print(TMultiP(T,p3));
 	return 0;
 }
+
+*/

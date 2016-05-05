@@ -28,5 +28,9 @@ void coordTransformationMatrix(m_uni T[][MATRIX_C_4],
 		m_uni x3,m_uni y3,m_uni z3,
 		m_uni A1,m_uni B1,m_uni C1);
 
+void getT_inv(m_uni T[][MATRIX_C_4],m_uni T_inv[][MATRIX_C_4]);
+
+Pos TMultiP(m_uni T[][MATRIX_C_4],Pos p);//T*(p,1)
+
 
 #endif
