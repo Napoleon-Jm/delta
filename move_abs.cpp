@@ -120,18 +120,34 @@ ana_uni* delta_move_abs_path(Delta &delta,ana_uni x,ana_uni y,ana_uni z,
 		j--;
 	}
 
-
+/*
 	for(int i = 0,j = 0;i<path_size*3;){
 		Pos p = Pos::pos_sum(delta.kin_pos,Pos::pos_mul(path[j],dis_unit));
-		cout<<p.x<<"  "<<p.y<<"  "<<p.z<<" in for "<<endl;
+		cout<<p.x<<"  "<<p.y<<"  "<<p.z<<"  "<<endl;
 		delta.inKin( p );
-		cout<<"in_theta in for"<<endl;
+		cout<<"in_theta"<<endl;
 		cout<<delta.in_theta[0]<<" "<<delta.in_theta[1]<<" "<<delta.in_theta[2]<<endl;
 		ana_path[i] = delta.in_theta[0];
 		i++;
 		ana_path[i] = delta.in_theta[1];
 		i++;
 		ana_path[i] = delta.in_theta[2];//fuck my fault.ana_path[i++] = delta.in_theta[3];
+		i++;
+		j++;
+	}
+	*/
+
+	for(int i = 0,j = 0;i<path_size*3;){
+		Pos p = Pos::pos_sum(delta.kin_pos,Pos::pos_mul(path[j],dis_unit));
+		cout<<p.x<<"  "<<p.y<<"  "<<p.z<<"  "<<endl;
+		delta.inKin( p );
+		cout<<"in_theta"<<endl;
+		cout<<delta.in_theta[0]<<" "<<delta.in_theta[1]<<" "<<delta.in_theta[2]<<endl;
+		ana_path[i] = p.x;
+		i++;
+		ana_path[i] = p.y;
+		i++;
+		ana_path[i] = p.z;//fuck my fault.ana_path[i++] = delta.in_theta[3];
 		i++;
 		j++;
 	}
@@ -314,6 +330,7 @@ ana_uni* delta_move_abs_circle_path(Delta &delta, ana_uni x2,ana_uni y2,ana_uni 
 /*
  *test function for delta_move_abs_path.
  
+*/
 
 int main(){
 	// cout<<m_pow(5)<<endl;
@@ -348,11 +365,10 @@ int main(){
 	delete[] test;
 	delete[] dig_path;
 }
-*/
 
 /*
 	test function for delta_move_abs_circle_path
- */
+
 
 int main(){
 	int pathNum = 10;
@@ -376,3 +392,4 @@ int main(){
 		cout<<path[i]<<"  "<<path[i+1]<<"  "<<path[i+2]<<endl;
 	}
 }
+ */
